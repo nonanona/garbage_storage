@@ -7,7 +7,7 @@ ifeq ($(UNAME),Darwin)
 endif
 
 CXX = clang++-3.6
-CXXFLAGS = -std=c++11 -Wno-deprecated-register
+CXXFLAGS = -std=c++11 -Wno-deprecated-register -g
 
 SRCDIR = src
 OUTDIR = out

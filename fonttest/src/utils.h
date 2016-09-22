@@ -11,3 +11,4 @@ uint32_t readU24(const void* ptr, size_t offset);
 uint16_t readU16(const void* ptr, size_t offset);
 
 uint16_t readS16(const void* ptr, size_t offset);
+

@@ -6,6 +6,7 @@
 #include "loca.h"
 #include "glyf.h"
 #include "head.h"
+#include "cvt.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -114,4 +115,10 @@ std::unique_ptr<HeadSubTable> TrueType::getHead() const {
   size_t length;
   const void* ptr = getTable(makeTag('h', 'e', 'a', 'd'), &length);
   return std::unique_ptr<HeadSubTable>(new HeadSubTable(ptr, length));
+}
+
+std::unique_ptr<CvtSubTable> TrueType::getCvt() const {
+  size_t length;
+  const void* ptr = getTable(makeTag('c', 'v', 't', ' '), &length);
+  return std::unique_ptr<CvtSubTable>(new CvtSubTable(ptr, length));
 }

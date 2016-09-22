@@ -1,5 +1,7 @@
 #include "gui.h"
 
+#include "glyph_utils.h"
+
 #include <goocanvas.h>
 #include <glog/logging.h>
 #include <sstream>
@@ -19,25 +21,6 @@ Gui::Gui(int w, int h, int cx, int cy, float scale, int margin)
   gtk_container_add (GTK_CONTAINER (window), canvas);
 
   root_ = goo_canvas_get_root_item (GOO_CANVAS (canvas));
-}
-
-std::vector<GlyphPoint> Gui::flattenPoints(const std::vector<GlyphPoint>& points) {
-  std::vector<GlyphPoint> out;
-  for (size_t j = 0; j < points.size(); ++j) {
-    const GlyphPoint* cur = &points[j];
-
-    size_t prev_idx = j == 0 ? points.size() - 1 : j - 1;
-    const GlyphPoint* prev = &points[prev_idx];
-
-    if (!prev->on_curve && !cur->on_curve) {
-      out.push_back(
-          GlyphPoint((cur->x + prev->x) / 2, (cur->y + prev->y) / 2, true));
-    }
-
-    out.push_back(*cur);
-  }
-
-  return out;
 }
 
 void Gui::drawPath(const std::vector<Contour>& contours, bool with_contours,
@@ -99,4 +82,8 @@ void Gui::drawLine(int from_x, int from_y, int to_x, int to_y,
   ss << "L " << toX(to_x) << " " << toY(to_y) << " ";
   goo_canvas_path_new(root_, ss.str().c_str(), "stroke-color", color.c_str(),
       NULL);
+}
+
+void Gui::fillRect(int x, int y, int w, int h, const std::string& color) {
+  goo_canvas_rect_new(root_, toX(x), toY(y), w * scale_, h * scale_, "fill-color", color.c_str(), NULL);
 }

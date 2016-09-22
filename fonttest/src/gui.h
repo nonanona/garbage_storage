@@ -19,7 +19,7 @@ class Gui {
 
   void drawLine(int from_x, int from_y, int to_x, int to_y, const std::string& color);
 
-  std::vector<GlyphPoint> flattenPoints(const std::vector<GlyphPoint>& points);
+  void fillRect(int x, int y, int w, int h, const std::string& color);
 
  private:
   int w_;

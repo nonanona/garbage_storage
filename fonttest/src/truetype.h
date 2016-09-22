@@ -9,6 +9,7 @@
 #include "utils.h"
 
 class CmapSubTable;
+class CvtSubTable;
 class MaxpSubTable;
 class LocaSubTable;
 class GlyfSubTable;
@@ -24,6 +25,7 @@ class TrueType {
   std::unique_ptr<LocaSubTable> getLoca() const;
   std::unique_ptr<GlyfSubTable> getGlyf() const;
   std::unique_ptr<HeadSubTable> getHead() const;
+  std::unique_ptr<CvtSubTable> getCvt() const;
 
   const void* getTable(uint32_t tag, size_t* length) const;
   void dump() const;

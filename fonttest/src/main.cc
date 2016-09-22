@@ -12,19 +12,6 @@
 #include "gui.h"
 #include "head.h"
 
-double norm(double x1, double y1, double x2, double y2) {
-  return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-}
-
-// returns true when intersect ab x cd
-bool isIntersect(int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy) {
-  int ta = (cx - dx) * (ay - cy) + (cy - dy) * (cx - ax);
-  int tb = (cx - dx) * (by - cy) + (cy - dy) * (cx - bx);
-  int tc = (ax - bx) * (cy - ay) + (ay - by) * (ax - cx);
-  int td = (ax - bx) * (dy - ay) + (ay - by) * (ax - dx);
-  return ta * tb < 0 && tc * td < 0;
-}
-
 int main (int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 

@@ -12,6 +12,7 @@ class CmapSubTable;
 class MaxpSubTable;
 class LocaSubTable;
 class GlyfSubTable;
+class HeadSubTable;
 
 class TrueType {
  public:
@@ -22,6 +23,7 @@ class TrueType {
   std::unique_ptr<MaxpSubTable> getMaxp() const;
   std::unique_ptr<LocaSubTable> getLoca() const;
   std::unique_ptr<GlyfSubTable> getGlyf() const;
+  std::unique_ptr<HeadSubTable> getHead() const;
 
   const void* getTable(uint32_t tag, size_t* length) const;
   void dump() const;

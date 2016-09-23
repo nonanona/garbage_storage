@@ -6,7 +6,7 @@ ifeq ($(UNAME),Darwin)
   OS = OSX
 endif
 
-CXX = clang++-3.6
+CXX = clang++
 CXXFLAGS = -std=c++11 -Wno-deprecated-register -g
 
 SRCDIR = src
@@ -15,18 +15,15 @@ OBJDIR = $(OUTDIR)/obj
 BINDIR = $(OUTDIR)/bin
 PWD = $(shell pwd)
 ifeq ($(OS), Linux)
+  PACKAGES = "libglog goocanvas"
   PKG_CONFIG_PATH="third_party/opencv3/lib/pkgconfig"
 else
+  PACKAGES = "libglog goocanvas-2.0"
   PKG_CONFIG_PATH=
 endif
-PACKAGES = "libglog goocanvas"
 
 INCLUDE = -I$(SRCDIR) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(PACKAGES) --cflags-only-I)
 LDFLAGS = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(PACKAGES) --libs)
-ifeq ($(OS), OSX)
-  INCLUDE += -I/opt/local/include
-endif
-
 
 CC_FILES = $(shell find $(SRCDIR) -name "*.cc")
 OBJ_FILES = $(addprefix $(OBJDIR)/, $(patsubst %.cc, %.o, $(CC_FILES)))

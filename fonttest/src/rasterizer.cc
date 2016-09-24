@@ -3,9 +3,11 @@
 #include <math.h>
 #include "glyf.h"
 #include "cvt.h"
+#include "fpgm.h"
 #include "glog/logging.h"
 #include "glyph_utils.h"
 #include "instructions.h"
+#include "prep.h"
 
 void Rasterizer::rasterize(const SimpleGlyphData& glyph,
                            std::vector<char>* out,
@@ -20,7 +22,7 @@ void Rasterizer::rasterize(const SimpleGlyphData& glyph,
 
   // Hinting here.
   std::vector<Contour> resolved =
-      HintStackMachine::execute(glyph, grid_size_, cvt_->cvt());
+      HintStackMachine::execute(glyph, grid_size_, tt_);
 
   for (int ix = 0; ix < x_grid_num; ++ix) {
     for (int iy = 0; iy < y_grid_num; ++iy) {

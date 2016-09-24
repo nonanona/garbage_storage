@@ -12,6 +12,8 @@
 #include "gui.h"
 #include "head.h"
 #include "cvt.h"
+#include "prep.h"
+#include "fpgm.h"
 #include "rasterizer.h"
 
 int main (int argc, char *argv[]) {
@@ -27,6 +29,8 @@ int main (int argc, char *argv[]) {
   std::unique_ptr<LocaSubTable> loca(ttf.getLoca());
   std::unique_ptr<GlyfSubTable> glyf(ttf.getGlyf());
   std::unique_ptr<CvtSubTable> cvt(ttf.getCvt());
+  std::unique_ptr<PrepSubTable> prep(ttf.getPrep());
+  std::unique_ptr<FpgmSubTable> fpgm(ttf.getFpgm());
 
   uint32_t glyphId = cmap->findGlyphId(c, 0);
   std::unique_ptr<SimpleGlyphData> simpleGlyph(
@@ -41,7 +45,7 @@ int main (int argc, char *argv[]) {
   uint32_t h = simpleGlyph->y_max - simpleGlyph->y_min;
   Gui gui(w, h, cx, cy, 0.3, 100);
 
-  Rasterizer rasterizer(px, head->unit_per_em(), cvt.get());
+  Rasterizer rasterizer(px, head->unit_per_em(), ttf);
 
   int x_grid_num;
   std::vector<char> pixels;

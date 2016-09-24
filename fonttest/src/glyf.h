@@ -5,12 +5,21 @@
 
 #include <vector>
 #include <memory>
+#include <string>
+#include <sstream>
 
 struct GlyphPoint {
   GlyphPoint(int16_t x, int16_t y, bool on) : x(x), y(y), on_curve(on) {}
   int16_t x;
   int16_t y;
   bool on_curve;
+
+  std::string toString() const {
+    std::stringstream ss;
+    ss << "(" << x << ", " << y << "): ";
+    ss << (on_curve ? "ON" : "OFF");
+    return ss.str();
+  }
 };
 
 struct Contour {

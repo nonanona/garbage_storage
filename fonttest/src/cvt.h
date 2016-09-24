@@ -11,6 +11,11 @@ class CvtSubTable {
 
   const std::vector<int16_t>& cvt() const { return cvt_; }
 
+  int16_t& operator [] (int i) {
+    return cvt_[i];
+  }
+
+
  private:
   std::vector<int16_t> cvt_;
 };

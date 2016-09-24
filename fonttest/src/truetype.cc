@@ -7,6 +7,8 @@
 #include "glyf.h"
 #include "head.h"
 #include "cvt.h"
+#include "prep.h"
+#include "fpgm.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -115,6 +117,18 @@ std::unique_ptr<HeadSubTable> TrueType::getHead() const {
   size_t length;
   const void* ptr = getTable(makeTag('h', 'e', 'a', 'd'), &length);
   return std::unique_ptr<HeadSubTable>(new HeadSubTable(ptr, length));
+}
+
+std::unique_ptr<FpgmSubTable> TrueType::getFpgm() const {
+  size_t length;
+  const void* ptr = getTable(makeTag('f', 'p', 'g', 'm'), &length);
+  return std::unique_ptr<FpgmSubTable>(new FpgmSubTable(ptr, length));
+}
+
+std::unique_ptr<PrepSubTable> TrueType::getPrep() const {
+  size_t length;
+  const void* ptr = getTable(makeTag('p', 'r', 'e', 'p'), &length);
+  return std::unique_ptr<PrepSubTable>(new PrepSubTable(ptr, length));
 }
 
 std::unique_ptr<CvtSubTable> TrueType::getCvt() const {

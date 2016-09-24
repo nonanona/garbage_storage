@@ -6,8 +6,13 @@ ifeq ($(UNAME),Darwin)
   OS = OSX
 endif
 
+ifeq ($(OS), Linux)
+CXX = clang++-3.6
+CXXFLAGS = -std=c++11 -Wno-deprecated-register -g
+else
 CXX = clang++
 CXXFLAGS = -std=c++11 -Wno-deprecated-register -g
+endif
 
 SRCDIR = src
 OUTDIR = out

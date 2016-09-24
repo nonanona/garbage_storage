@@ -2,6 +2,8 @@
 
 #include "glyf.h"
 
+class TrueType;
+
 class HintStackMachine {
  public:
   static void dumpInstructions(const std::vector<uint8_t>& inst);
@@ -9,5 +11,5 @@ class HintStackMachine {
   static std::vector<Contour> execute(
       const SimpleGlyphData& glyph,
       int grid_size,
-      const std::vector<int16_t>& cvt);
+      const TrueType& truetype);
 };

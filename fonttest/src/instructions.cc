@@ -806,6 +806,11 @@ void WCVTF(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
   LOG(FATAL) << "Not implemented.";
 }
 
+void SROUND(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
+  LOG(ERROR) << __FUNCTION__;
+  LOG(FATAL) << "Not implemented.";
+}
+
 void DELTAC(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
   uint32_t nump = ctx->stack.top(); ctx->stack.pop();
   if (opcode == 0x73) {
@@ -842,11 +847,6 @@ void DELTAC(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
       (*ctx->cvt)[arg] += B;
     }
   }
-}
-
-void SROUND(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
-  LOG(ERROR) << __FUNCTION__;
-  LOG(FATAL) << "Not implemented.";
 }
 
 void ROFF(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {

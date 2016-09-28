@@ -37,7 +37,7 @@ void Gui::drawPath(const std::vector<GlyphPoint>& points, bool with_contours,
   for (size_t j = 0; j < points.size(); ++j) {
     const GlyphPoint* cur = &points[j];
 
-    if (with_contours)
+    if (with_contours && !cur->interpolated)
       drawPoint(cur->x, cur->y, 2.0, cur->on_curve ? "red" : "blue");
 
     size_t prev_idx = j == 0 ? points.size() - 1 : j - 1;

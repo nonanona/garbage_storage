@@ -4,6 +4,7 @@
 #include <vector>
 
 class TrueType;
+class Gui;
 
 class Rasterizer {
  public:
@@ -13,7 +14,7 @@ class Rasterizer {
       : grid_size_(grid_size), tt_(tt) {}
 
   void rasterize(const SimpleGlyphData& glyphData, std::vector<char>* out,
-                 int* x_pixel_num);
+                 int* x_pixel_num, Gui* gui);
 
   int grid_size() const { return grid_size_; }
 

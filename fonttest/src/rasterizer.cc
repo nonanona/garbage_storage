@@ -9,9 +9,12 @@
 #include "instructions.h"
 #include "prep.h"
 
+#include "gui.h"
+
 void Rasterizer::rasterize(const SimpleGlyphData& glyph,
                            std::vector<char>* out,
-                           int* x_pixel_num) {
+                           int* x_pixel_num,
+                           Gui* gui) {
   int width = glyph.x_max - glyph.x_min;
   int height = glyph.y_max - glyph.y_min;
   int x_grid_num = width / grid_size_ + 1;
@@ -39,6 +42,10 @@ void Rasterizer::rasterize(const SimpleGlyphData& glyph,
           GlyphPoint* prev = &points[j == 0 ? points.size() - 1 : j - 1];
           GlyphPoint* cur = &points[j];
           GlyphPoint* next = &points[j == points.size() - 1 ? 0 : j + 1];
+
+          // move grid center to avoid on the contours.
+          while (prev->y == c_grid_y || next->y == c_grid_y)
+            c_grid_y++;
 
           if (cur->on_curve) {
             if (prev->on_curve) {

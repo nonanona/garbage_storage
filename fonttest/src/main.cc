@@ -35,26 +35,31 @@ int main (int argc, char *argv[]) {
   TrueType ttf(fname, index);
   int px = argc == (char_arg_index + 2) ? atoi(argv[char_arg_index + 1]) : 12;
 
+  const char* ch_str = argv[char_arg_index];
   uint32_t ucs4 = 0;
-  uint8_t leading = argv[char_arg_index][0];
-  size_t utf8_len;
-  if (leading < 0x80) {
-    utf8_len = 1;
-    ucs4 = leading;
-  } else if ((leading & 0xe0) == 0xc0) {
-    utf8_len = 2;
-    ucs4 = leading & 0x1f;
-  } else if ((leading & 0xf0) == 0xe0) {
-    utf8_len = 3;
-    ucs4 = leading & 0x0f;
-  } else if ((leading & 0xf8) == 0xf0) {
-    utf8_len = 4;
-    ucs4 = leading & 0x07;
-  }
+  if (ch_str[0] == 'U' && ch_str[1] == '+') {
+    ucs4 = (uint32_t)strtol(ch_str + 2, NULL, 16);
+  } else {
+    uint8_t leading = ch_str[0];
+    size_t utf8_len;
+    if (leading < 0x80) {
+      utf8_len = 1;
+      ucs4 = leading;
+    } else if ((leading & 0xe0) == 0xc0) {
+      utf8_len = 2;
+      ucs4 = leading & 0x1f;
+    } else if ((leading & 0xf0) == 0xe0) {
+      utf8_len = 3;
+      ucs4 = leading & 0x0f;
+    } else if ((leading & 0xf8) == 0xf0) {
+      utf8_len = 4;
+      ucs4 = leading & 0x07;
+    }
 
-  for (int i = 1; i < utf8_len; ++i) {
-    ucs4 <<= 6;
-    ucs4 += argv[char_arg_index][i] & 0x3f;
+    for (int i = 1; i < utf8_len; ++i) {
+      ucs4 <<= 6;
+      ucs4 += ch_str[i] & 0x3f;
+    }
   }
 
   std::unique_ptr<CmapSubTable> cmap(ttf.getCmap());
@@ -63,7 +68,6 @@ int main (int argc, char *argv[]) {
 
   std::unique_ptr<LocaSubTable> loca(ttf.getLoca());
   std::unique_ptr<GlyfSubTable> glyf(ttf.getGlyf());
-  LOG(ERROR) << "Offset : " << loca->findGlyfOffset(glyphId);
   std::unique_ptr<SimpleGlyphData> simpleGlyph(
       static_cast<SimpleGlyphData*>(
           glyf->getGlyfData(loca->findGlyfOffset(glyphId), loca.get()).release()));
@@ -81,7 +85,7 @@ int main (int argc, char *argv[]) {
   int x_grid_num;
   std::vector<char> pixels;
 
-  rasterizer.rasterize(*simpleGlyph.get(), &pixels, &x_grid_num);
+  rasterizer.rasterize(*simpleGlyph.get(), &pixels, &x_grid_num, &gui);
 
   int y_grid_num = pixels.size() / x_grid_num;
   int grid = rasterizer.grid_size();

@@ -1,14 +1,74 @@
 #include "glyf.h"
 
 #include "utils.h"
+#include "loca.h"
 #include <glog/logging.h>
 
-std::unique_ptr<GlyfData> GlyfSubTable::getGlyfData(uint32_t offset) const {
+std::unique_ptr<GlyfData> GlyfSubTable::getGlyfData(uint32_t offset, LocaSubTable* loca) const {
   const uint8_t* glyph = ptr_ + offset;
   int16_t num_of_contours = readS16(glyph, 0);
   if (num_of_contours < 0) 
-    LOG(FATAL) << "Composite glyph is not supported.";
+    return std::unique_ptr<GlyfData>(getCompositeGlyfData(offset, loca).release());
+  else
+    return std::unique_ptr<GlyfData>(getSimpleGlyfData(offset).release());
+}
 
+std::unique_ptr<SimpleGlyphData> GlyfSubTable::getCompositeGlyfData(uint32_t offset, LocaSubTable* loca) const {
+  std::unique_ptr<SimpleGlyphData> data(new SimpleGlyphData());
+  const uint8_t* glyph = ptr_ + offset;
+  int16_t num_of_contours = readS16(glyph, 0);
+  if (num_of_contours > 0) 
+    LOG(FATAL) << "Simple glyph is specified.";
+  data->x_min = readS16(glyph, 2);
+  data->y_min = readS16(glyph, 4);
+  data->x_max = readS16(glyph, 6);
+  data->y_max = readS16(glyph, 8);
+  const size_t kCompositeGlyfOffset = 10;
+
+  uint16_t flag;
+  size_t composition_glyph_offset = kCompositeGlyfOffset;
+  do {
+    flag = readU16(glyph, composition_glyph_offset );
+    LOG(ERROR) << std::hex << "0x" << flag;
+    uint16_t glyph_index = readU16(glyph, composition_glyph_offset + 2);
+    LOG(ERROR) << std::hex << "Glyph Index: " << glyph_index;
+
+    int16_t arg1, arg2;
+    size_t nextOffset;
+    if ((flag & 0x01) != 0) {
+      arg1 = readS16(glyph, composition_glyph_offset + 4);
+      arg2 = readS16(glyph, composition_glyph_offset + 6);
+      composition_glyph_offset += 8;
+    } else {
+      arg1 = (int8_t)glyph[composition_glyph_offset + 4];
+      arg2 = (int8_t)glyph[composition_glyph_offset + 5];
+      composition_glyph_offset += 6;
+    }
+
+    if ((flag & 0x02) == 0) {
+      LOG(FATAL) << "Point coordinate is not supported.";
+    }
+
+    std::unique_ptr<SimpleGlyphData> compose_glyph = getSimpleGlyfData(
+        loca->findGlyfOffset(glyph_index));
+
+    for (int i = 0; i < compose_glyph->contours.size(); ++i) {
+      for (int j = 0; j < compose_glyph->contours[i].points.size(); ++j) {
+        compose_glyph->contours[i].points[j].x += arg1;
+        compose_glyph->contours[i].points[j].y += arg2;
+      }
+      data->contours.push_back(compose_glyph->contours[i]);
+    }
+
+  } while ((flag & (1 << 5u)) != 0);
+  return data;
+}
+
+std::unique_ptr<SimpleGlyphData> GlyfSubTable::getSimpleGlyfData(uint32_t offset) const {
+  const uint8_t* glyph = ptr_ + offset;
+  int16_t num_of_contours = readS16(glyph, 0);
+  if (num_of_contours < 0) 
+    LOG(FATAL) << "Composite glyph is specified.";
   std::unique_ptr<SimpleGlyphData> data(new SimpleGlyphData());
   data->num_of_contours = num_of_contours;
   data->x_min = readS16(glyph, 2);
@@ -38,7 +98,7 @@ std::unique_ptr<GlyfData> GlyfSubTable::getGlyfData(uint32_t offset) const {
     }
   }
   if (flags.size() != total_pts) {
-    LOG(FATAL) << "Invalid count of flags";
+    LOG(FATAL) << "Invalid count of flags: flags:" << flags.size() << ", total points: " << total_pts;
   }
 
   size_t x_cord_offset = flagOffset;
@@ -100,5 +160,5 @@ std::unique_ptr<GlyfData> GlyfSubTable::getGlyfData(uint32_t offset) const {
       contour.points.push_back(GlyphPoint(abs_x[pt], abs_y[pt], flags[pt] & 0x01));
     }
   }
-  return std::unique_ptr<GlyfData>(data.release());
+  return data;
 }

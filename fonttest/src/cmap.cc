@@ -64,6 +64,7 @@ uint32_t CmapSubTable::findFromFormat4(uint32_t ch) {
     uint32_t end = readU16(format4_ptr_, endCountOffset);
     uint32_t start = readU16(format4_ptr_, startCountOffset);
 
+    const size_t deltaOffsetX = startCountOffset + 2 * seg_count;
     if (ch < start || end < ch)
       continue;
 
@@ -86,6 +87,19 @@ uint32_t CmapSubTable::findFromFormat4(uint32_t ch) {
 }
 
 uint32_t CmapSubTable::findFromFormat12(uint32_t ch) {
-  LOG(FATAL) << "Not implemented";
-  return 0;
+  uint32_t format = readU16(format12_ptr_, 0);
+  if (format != 12)
+    LOG(FATAL) << "Invalid format id";
+  uint32_t nGroups = readU32(format12_ptr_, 12);
+
+  const size_t kGroupOffset = 16;
+  for (size_t i = 0; i < nGroups; ++i) {
+    uint32_t start = readU32(format12_ptr_, kGroupOffset + i * 12);
+    uint32_t end = readU32(format12_ptr_, kGroupOffset + i * 12 + 4);
+    uint32_t glyphId = readU32(format12_ptr_, kGroupOffset + i * 12 + 8);
+    if (ch < start || end < ch)
+      continue;
+    return glyphId + (ch - start);
+  }
+  return (uint32_t)-1;
 }

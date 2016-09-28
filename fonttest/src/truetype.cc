@@ -17,7 +17,7 @@
 #include <sys/mman.h>
 #include <glog/logging.h>
 
-TrueType::TrueType(const std::string& fname) {
+TrueType::TrueType(const std::string& fname, int index) {
   int fd = open(fname.c_str(), O_RDONLY);
   struct stat st = {};
   if (fstat(fd, &st) != 0){
@@ -28,33 +28,60 @@ TrueType::TrueType(const std::string& fname) {
   if (ptr_ == nullptr) {
     LOG(FATAL) << "Failed to map font file: " << fname;
   }
-  readHeader();
+  readHeader(index);
 }
 
 TrueType::~TrueType() {
   munmap(ptr_, length_);
 }
 
-void TrueType::readHeader() {
+void TrueType::readHeader(int index) {
   const size_t kOpenTypeHeaderSize = 12;
   if (length_ < kOpenTypeHeaderSize)
     LOG(FATAL) << "Invalid length of file";
   uint32_t sfnt_ver = readU32(ptr_, 0);
-  if (sfnt_ver != 0x00010000)
-    LOG(FATAL) << "Invalid sfnt version";
-  num_tables_ = readU16(ptr_, 4);
+
+  if (sfnt_ver == 0x00010000 || sfnt_ver == makeTag('O', 'T', 'T', 'O')) {
+    if (index != 0)
+      LOG(FATAL) << "Specified font file is not a collection.";
+
+    readOffsetTables(0);
+    return;
+  } else if (sfnt_ver == makeTag('t', 't', 'c', 'f')) {
+    // Font Collection
+    uint32_t version = readU32(ptr_, 4);
+
+    if (version != 0x00010000 && version != 0x00020000)
+      LOG(FATAL) << "Not supported version: " << std::hex << version;
+
+    uint32_t numFonts = readU32(ptr_, 8);
+    uint32_t offsetTableOffset = readU32(ptr_, 12 + 4 * index);
+    readOffsetTables(offsetTableOffset);
+  } else {
+    LOG(FATAL) << "Unknown sfnt version: " << std::hex << sfnt_ver;
+  }
+}
+
+void TrueType::readOffsetTables(size_t tblStartOffset) {
+  const size_t kOpenTypeHeaderSize = 12;
+  uint32_t sfnt_ver = readU32(ptr_, tblStartOffset);
+
+  if (sfnt_ver != 0x00010000 && sfnt_ver != makeTag('O', 'T', 'T', 'O'))
+    LOG(FATAL) << "Invalid sfnt version: " << std::hex << sfnt_ver;
+
+  num_tables_ = readU16(ptr_, tblStartOffset + 4);
   if (num_tables_ == 0)
     LOG(FATAL) << "Table is empty";
   if (length_ < num_tables_ * sizeof(OffsetTable) + kOpenTypeHeaderSize)
     LOG(FATAL) << "Invalid length of file: less than offset table size";
-  range_shift_ = readU16(ptr_, 6);
-  entry_selector_ = readU16(ptr_, 8);
-  range_shift_ = readU16(ptr_, 10);
+  range_shift_ = readU16(ptr_, tblStartOffset + 6);
+  entry_selector_ = readU16(ptr_, tblStartOffset + 8);
+  range_shift_ = readU16(ptr_, tblStartOffset + 10);
 
   tables_.resize(num_tables_);
 
   for (size_t i = 0; i < num_tables_; ++i) {
-    const size_t tableOffset = kOpenTypeHeaderSize + sizeof(OffsetTable) * i;
+    const size_t tableOffset = tblStartOffset + kOpenTypeHeaderSize + sizeof(OffsetTable) * i;
     tables_[i].tag = readU32(ptr_, tableOffset);
     tables_[i].check_sum = readU32(ptr_, tableOffset + 4);
     tables_[i].offset = readU32(ptr_, tableOffset + 8);

@@ -20,6 +20,6 @@ uint32_t LocaSubTable::findGlyfOffset(uint16_t glyph_id) const {
   if (is_short_) {
       return readU16(ptr_, glyph_id * 2) * 2;
   } else {
-      return  readU16(ptr_, glyph_id * 4) * 2;
+      return readU32(ptr_, glyph_id * 4);
   }
 }

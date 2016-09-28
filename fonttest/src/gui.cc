@@ -38,7 +38,7 @@ void Gui::drawPath(const std::vector<GlyphPoint>& points, bool with_contours,
     const GlyphPoint* cur = &points[j];
 
     if (with_contours)
-      drawPoint(cur->x, cur->y, 5.0, cur->on_curve ? "blue" : "red");
+      drawPoint(cur->x, cur->y, 2.0, cur->on_curve ? "red" : "blue");
 
     size_t prev_idx = j == 0 ? points.size() - 1 : j - 1;
     const GlyphPoint* prev = &points[prev_idx];
@@ -71,8 +71,8 @@ void Gui::drawPath(const std::string& command, const std::string& color) {
 }
 
 void Gui::drawPoint(int x, int y, float width, const std::string& color) {
-  goo_canvas_ellipse_new(root_, toX(x), toY(y), 10, 10, "stroke-color", color.c_str(),
-      "line-width", width, NULL);
+  goo_canvas_ellipse_new(root_, toX(x), toY(y), 5, 5, "stroke-color", color.c_str(),
+      "fill-color", color.c_str(), "line-width", width, NULL);
 }
 
 void Gui::drawLine(int from_x, int from_y, int to_x, int to_y,

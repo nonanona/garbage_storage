@@ -8,11 +8,15 @@
 #include <string>
 #include <sstream>
 
+#include "loca.h"
+
 struct GlyphPoint {
-  GlyphPoint(int16_t x, int16_t y, bool on) : x(x), y(y), on_curve(on) {}
+  GlyphPoint(int16_t x, int16_t y, bool on, bool interpolated) : x(x), y(y), on_curve(on), interpolated(interpolated) {}
+  GlyphPoint(int16_t x, int16_t y, bool on) : GlyphPoint(x, y, on, false) {}
   int16_t x;
   int16_t y;
   bool on_curve;
+  bool interpolated;
 
   std::string toString() const {
     std::stringstream ss;
@@ -47,7 +51,10 @@ class GlyfSubTable {
   GlyfSubTable(const void* ptr, size_t length)
       : ptr_((const uint8_t*)ptr), length_(length) {}
 
-  std::unique_ptr<GlyfData> getGlyfData(uint32_t offset) const;
+  std::unique_ptr<GlyfData> getGlyfData(uint32_t offset, LocaSubTable* loca) const;
+
+  std::unique_ptr<SimpleGlyphData> getSimpleGlyfData(uint32_t offset) const;
+  std::unique_ptr<SimpleGlyphData> getCompositeGlyfData(uint32_t offset, LocaSubTable* loca) const;
 
  private:
   const uint8_t* ptr_;

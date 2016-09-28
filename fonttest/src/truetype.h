@@ -19,7 +19,8 @@ class FpgmSubTable;
 
 class TrueType {
  public:
-  TrueType(const std::string& fname);
+  TrueType(const std::string& fname) : TrueType(fname, 0) {}
+  TrueType(const std::string& fname, int index);
   virtual ~TrueType();
 
   std::unique_ptr<CmapSubTable> getCmap() const;
@@ -42,7 +43,8 @@ class TrueType {
     uint32_t length;
   };
 
-  void readHeader();
+  void readHeader(int index);
+  void readOffsetTables(size_t tblStartOff);
 
   void* ptr_;
   size_t length_;

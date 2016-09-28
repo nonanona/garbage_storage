@@ -14,7 +14,7 @@ std::vector<GlyphPoint> flattenPoints(const std::vector<GlyphPoint>& points) {
 
     if (!prev->on_curve && !cur->on_curve) {
       out.push_back(
-          GlyphPoint((cur->x + prev->x) / 2, (cur->y + prev->y) / 2, true));
+          GlyphPoint((cur->x + prev->x) / 2, (cur->y + prev->y) / 2, true, true));
     }
 
     out.push_back(*cur);

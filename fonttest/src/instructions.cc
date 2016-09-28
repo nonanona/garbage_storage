@@ -918,6 +918,7 @@ std::vector<Contour> HintStackMachine::execute(
     int grid_size,
     const TrueType& tt) {
 
+  /*
   Context ctx(glyph, grid_size, tt);
   std::unique_ptr<FpgmSubTable> fpgm = tt.getFpgm();
   std::unique_ptr<PrepSubTable> prep = tt.getPrep();
@@ -929,6 +930,8 @@ std::vector<Contour> HintStackMachine::execute(
   ctx.run(&prep_inst[0], prep_inst.size());
   ctx.run(&glyph.instructions[0], glyph.instructions.size());
   return ctx.contours;
+  */
+  return glyph.contours;
 }
 
 // static

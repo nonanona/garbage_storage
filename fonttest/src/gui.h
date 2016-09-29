@@ -10,11 +10,11 @@ class Gui {
   Gui(int w, int h, int cx, int cy) : Gui(w, h, cx, cy, 1.0, 0) {}
   Gui(int w, int h, int cx, int cy, float scale, int margin);
 
-  void drawPath(const std::string& command, const std::string& color);
+  void drawPath(const std::string& command, const std::string& color, float width);
   void drawPath(const std::vector<Contour>& contours, bool with_contours,
-      const std::string& color, bool close_path);
+      const std::string& color, bool close_path, float width);
   void drawPath(const std::vector<GlyphPoint>& contours, bool with_contours,
-      const std::string& color, bool close_path);
+      const std::string& color, bool close_path, float width);
   void drawPoint(int x, int y, float width, const std::string& color);
 
   void drawLine(int from_x, int from_y, int to_x, int to_y, const std::string& color);

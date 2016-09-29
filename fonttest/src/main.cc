@@ -121,7 +121,8 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  gui.drawPath(simpleGlyph->contours, true, "blue", true);
+  gui.drawPath(simpleGlyph->contours, false, "blue", true, 3.0);
+  rasterizer.rasterize(*simpleGlyph.get(), &pixels, &x_grid_num, &gui);
 
   gtk_main();
 

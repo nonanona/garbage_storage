@@ -15,8 +15,19 @@ class Rasterizer {
 
   void rasterize(const SimpleGlyphData& glyphData, std::vector<char>* out,
                  int* x_pixel_num, Gui* gui);
-  bool isBitOn(const SimpleGlyphData& glyph,
-      const std::vector<Contour>& resolved, int ix, int iy);
+  bool isBitOn(
+      const SimpleGlyphData& glyph,
+      const std::vector<Contour>& resolved, int ix, int iy,
+      Gui* gui, bool debug_out);
+  bool isBitOnByRule2a(
+      const SimpleGlyphData& glyph,
+      const std::vector<Contour>& resolved, int ix, int iy,
+      Gui* gui, bool debug_out);
+
+  bool isBitOnByRule2b(
+      const SimpleGlyphData& glyph,
+      const std::vector<Contour>& resolved, int ix, int iy,
+      Gui* gui, bool debug_out);
 
   int grid_size() const { return grid_size_; }
 

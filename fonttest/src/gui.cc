@@ -24,15 +24,15 @@ Gui::Gui(int w, int h, int cx, int cy, float scale, int margin)
 }
 
 void Gui::drawPath(const std::vector<Contour>& contours, bool with_contours,
-    const std::string& color, bool close_path) {
+    const std::string& color, bool close_path, float width) {
   for (size_t i = 0; i < contours.size(); ++i) {
     std::vector<GlyphPoint> points = flattenPoints(contours[i].points);
-    drawPath(points, with_contours, color, close_path);
+    drawPath(points, with_contours, color, close_path, width);
   }
 }
 
 void Gui::drawPath(const std::vector<GlyphPoint>& points, bool with_contours,
-    const std::string& color, bool close_path) {
+    const std::string& color, bool close_path, float width) {
   std::stringstream ss;
   for (size_t j = 0; j < points.size(); ++j) {
     const GlyphPoint* cur = &points[j];
@@ -63,11 +63,12 @@ void Gui::drawPath(const std::vector<GlyphPoint>& points, bool with_contours,
       }
     }
   }
-  drawPath(ss.str(), color);
+  drawPath(ss.str(), color, width);
 }
 
-void Gui::drawPath(const std::string& command, const std::string& color) {
-  goo_canvas_path_new(root_, command.c_str(), "stroke-color", color.c_str(), NULL);
+void Gui::drawPath(const std::string& command, const std::string& color, float width) {
+  goo_canvas_path_new(root_, command.c_str(), "stroke-color", color.c_str(),
+      "line-width", width, NULL);
 }
 
 void Gui::drawPoint(int x, int y, float width, const std::string& color) {

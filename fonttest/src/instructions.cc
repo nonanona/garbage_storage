@@ -29,6 +29,7 @@
     V(SRP1, 0, 0x11, zero) \
     V(SRP2, 0, 0x12, zero) \
     V(SZPS, 0, 0x16, zero) \
+    V(SLOOP, 0, 0x17, zero) \
     V(RTG, 0, 0x18, zero) \
     V(ELSE, 0, 0x1B, zero) \
     V(SCVTCI, 0, 0x1D, zero) \
@@ -297,6 +298,8 @@ struct Context {
   uint32_t rp1;
   uint32_t rp2;
 
+  uint32_t loop;
+
   bool scan_control;
   int scan_type;
   int delta_base;
@@ -485,9 +488,15 @@ void SZPS(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
   LOG(FATAL) << "Not implemented.";
 }
 
+void SLOOP(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
+  uint32_t n = ctx->stack.top(); ctx->stack.pop();
+  LOG(ERROR) << __FUNCTION__ << ": " << n;
+  ctx->loop = n;
+}
+
 void RTG(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
   LOG(ERROR) << __FUNCTION__;
-  LOG(FATAL) << "Not implemented.";
+  ctx->round_state = 1;
 }
 
 void ELSE(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
@@ -615,7 +624,8 @@ void ENDF(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
 }
 
 void MDAP(int opcode, const uint8_t* is, size_t len, Context* ctx, int* pc) {
-  LOG(ERROR) << __FUNCTION__;
+  uint32_t pt = ctx->stack.top(); ctx->stack.pop();
+  LOG(ERROR) << __FUNCTION__ << ": " << pt;
   LOG(FATAL) << "Not implemented.";
 }
 
@@ -918,8 +928,8 @@ std::vector<Contour> HintStackMachine::execute(
     int grid_size,
     const TrueType& tt) {
 
-  /*
   Context ctx(glyph, grid_size, tt);
+  /*
   std::unique_ptr<FpgmSubTable> fpgm = tt.getFpgm();
   std::unique_ptr<PrepSubTable> prep = tt.getPrep();
 
